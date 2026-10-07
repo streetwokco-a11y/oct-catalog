@@ -1,0 +1,34 @@
+{
+  "channel": "amazon",
+  "name": "Amazon Seller Central Marketplace",
+  "version": "2026.1",
+  "title": {
+    "ruleId": "amazon.v2026.1.title_max_length",
+    "maxCharacters": 200,
+    "minCharacters": 40,
+    "prohibitedWords": ["best seller", "hot item", "free shipping", "top rated", "cheap", "discount", "100% guaranteed"]
+  },
+  "backendSearchTerms": {
+    "ruleId": "amazon.v2026.1.backend_bytes_limit",
+    "maxBytes": 249,
+    "allowCommas": false,
+    "allowDuplication": false
+  },
+  "bullets": {
+    "ruleId": "amazon.v2026.1.bullets_count",
+    "recommendedCount": 5,
+    "minCount": 3,
+    "maxCharPerBullet": 250,
+    "minCharPerBullet": 50,
+    "allowEmojis": false
+  },
+  "images": {
+    "ruleId": "amazon.v2026.1.image_resolution",
+    "minResolution": "1000x1000",
+    "recommendedResolution": "2000x2000",
+    "pureWhiteBackground": true,
+    "frameFillPercent": 85,
+    "minImageCount": 3
+  },
+  "requiredAttributes": ["name", "price", "stock", "description", "category"]
+}

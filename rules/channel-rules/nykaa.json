@@ -1,0 +1,27 @@
+{
+  "channel": "nykaa",
+  "name": "Nykaa Merchant Network",
+  "version": "2026.1",
+  "title": {
+    "ruleId": "nykaa.v2026.1.title_max_length",
+    "maxCharacters": 150,
+    "minCharacters": 20
+  },
+  "backendSearchTerms": {
+    "ruleId": "nykaa.v2026.1.backend_bytes_limit",
+    "maxBytes": 500,
+    "allowCommas": true
+  },
+  "bullets": {
+    "ruleId": "nykaa.v2026.1.bullets_count",
+    "recommendedCount": 5,
+    "minCount": 3
+  },
+  "images": {
+    "ruleId": "nykaa.v2026.1.image_resolution",
+    "minResolution": "1000x1000",
+    "pureWhiteBackground": true,
+    "minImageCount": 3
+  },
+  "requiredAttributes": ["name", "price", "stock", "Shade", "Certification"]
+}

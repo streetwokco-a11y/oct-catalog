@@ -1,0 +1,27 @@
+{
+  "channel": "myntra",
+  "name": "Myntra Partner Portal",
+  "version": "2026.1",
+  "title": {
+    "ruleId": "myntra.v2026.1.title_max_length",
+    "maxCharacters": 120,
+    "minCharacters": 20
+  },
+  "backendSearchTerms": {
+    "ruleId": "myntra.v2026.1.backend_bytes_limit",
+    "maxBytes": 500,
+    "allowCommas": true
+  },
+  "bullets": {
+    "ruleId": "myntra.v2026.1.bullets_count",
+    "recommendedCount": 5,
+    "minCount": 3
+  },
+  "images": {
+    "ruleId": "myntra.v2026.1.image_resolution",
+    "minResolution": "1080x1440",
+    "aspectRatio": "3:4",
+    "minImageCount": 4
+  },
+  "requiredAttributes": ["name", "price", "stock", "Size", "Material"]
+}

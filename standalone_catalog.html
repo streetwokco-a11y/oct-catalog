@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OCT Catalog | Intelligent Product Showcase</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0b0f19;
+      --bg-secondary: #131b2e;
+      --glass-bg: rgba(15, 23, 42, 0.75);
+      --glass-border: rgba(255, 255, 255, 0.12);
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-primary);
+      color: #f8fafc;
+    }
+    h1, h2, h3, h4, h5 { font-family: 'Outfit', sans-serif; }
+    .glass-panel {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const PRODUCTS = [
+      {
+        id: 'oct-001',
+        name: 'OctaCore AI Neural Workstation',
+        category: 'AI Hardware',
+        price: 3499,
+        originalPrice: 3899,
+        rating: 4.9,
+        stock: 14,
+        badge: 'Flagship',
+        image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80',
+        description: 'Ultra-high throughput AI local workstation featuring 128GB Unified HBM memory and liquid cryogenic cooling system.'
+      },
+      {
+        id: 'oct-002',
+        name: 'AeroGlass AR Vision Goggles',
+        category: 'Electronics',
+        price: 1299,
+        originalPrice: 1499,
+        rating: 4.8,
+        stock: 22,
+        badge: 'Bestseller',
+        image: 'https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=800&q=80',
+        description: 'Spatial computing glasses with micro-OLED 4K dual displays, real-time eye tracking, and hand gesture recognition.'
+      },
+      {
+        id: 'oct-003',
+        name: 'Quantum-Shield Haptic Jacket',
+        category: 'Apparel',
+        price: 649,
+        originalPrice: 799,
+        rating: 4.7,
+        stock: 9,
+        badge: 'Limited Edition',
+        image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=800&q=80',
+        description: 'Weatherproof technical jacket embedded with 64 precision haptic feedback nodes and active thermal regulation.'
+      },
+      {
+        id: 'oct-004',
+        name: 'Orbital Ambient Core Station',
+        category: 'Smart Home',
+        price: 399,
+        originalPrice: 450,
+        rating: 4.9,
+        stock: 35,
+        badge: 'Trending',
+        image: 'https://images.unsplash.com/photo-1507646298591-24757e69796d?auto=format&fit=crop&w=800&q=80',
+        description: 'Floating magnetic levitation home hub with spatial atmospheric lighting, HEPA air plasma purification, and AI voice control.'
+      }
+    ];
+
+    function App() {
+      const [search, setSearch] = React.useState('');
+      const [category, setCategory] = React.useState('All');
+      const [cart, setCart] = React.useState([]);
+
+      const filtered = PRODUCTS.filter(p => {
+        const catMatch = category === 'All' || p.category === category;
+        const searchMatch = p.name.toLowerCase().includes(search.toLowerCase());
+        return catMatch && searchMatch;
+      });
+
+      return (
+        <div className="min-h-screen pb-12">
+          {/* Header */}
+          <header className="sticky top-0 z-30 glass-panel border-b border-slate-800">
+            <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center font-extrabold text-white text-lg">
+                  OCT
+                </div>
+                <div>
+                  <h1 className="font-extrabold text-xl tracking-tight">OCT Catalog</h1>
+                  <p className="text-xs text-slate-400">Standalone Enterprise Showcase</p>
+                </div>
+              </div>
+
+              <input
+                type="text"
+                placeholder="Search catalog products..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="w-80 px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-indigo-500"
+              />
+
+              <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-sm shadow-lg shadow-indigo-600/30">
+                Cart ({cart.reduce((a,b)=>a+b.quantity, 0)})
+              </button>
+            </div>
+          </header>
+
+          {/* Hero */}
+          <div className="max-w-7xl mx-auto px-6 mt-8">
+            <div className="glass-panel p-10 rounded-3xl border border-slate-800 bg-gradient-to-r from-indigo-950/40 via-purple-950/20 to-slate-950">
+              <span className="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-400 text-xs font-bold uppercase tracking-wider">
+                Catalog Workspace 2026
+              </span>
+              <h2 className="text-4xl font-extrabold mt-3 leading-tight">
+                Next-Gen Hardware & <br /><span className="gradient-text">Interactive Product Index</span>
+              </h2>
+              <p className="text-slate-400 text-sm mt-2 max-w-xl">
+                Explore catalog models, specifications, pricing, and live inventory directly from your local workspace.
+              </p>
+            </div>
+          </div>
+
+          {/* Category Tabs */}
+          <div className="max-w-7xl mx-auto px-6 mt-8 flex gap-3">
+            {['All', 'AI Hardware', 'Electronics', 'Apparel', 'Smart Home'].map(cat => (
+              <button
+                key={cat}
+                onClick={() => setCategory(cat)}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                  category === cat ? 'bg-indigo-600 text-white' : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-white'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* Product Grid */}
+          <div className="max-w-7xl mx-auto px-6 mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {filtered.map(p => (
+              <div key={p.id} className="glass-panel rounded-2xl border border-slate-800 overflow-hidden hover:border-indigo-500/40 transition-all flex flex-col justify-between">
+                <div>
+                  <img src={p.image} alt={p.name} className="w-full h-48 object-cover" />
+                  <div className="p-4">
+                    <span className="text-[10px] font-bold uppercase text-indigo-400">{p.category}</span>
+                    <h3 className="font-bold text-base mt-1 line-clamp-1">{p.name}</h3>
+                    <p className="text-xs text-slate-400 mt-1 line-clamp-2">{p.description}</p>
+                  </div>
+                </div>
+
+                <div className="p-4 pt-0 flex items-center justify-between border-t border-slate-800/60 mt-2">
+                  <div>
+                    <span className="text-lg font-extrabold">${p.price}</span>
+                    <span className="text-[10px] text-emerald-400 block">{p.stock} in stock</span>
+                  </div>
+                  <button 
+                    onClick={() => setCart(prev => [...prev, { ...p, quantity: 1 }])}
+                    className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg"
+                  >
+                    Add to Cart
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

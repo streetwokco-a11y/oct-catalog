@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ChannelRuleConfig",
+  "type": "object",
+  "required": ["channel", "name", "version", "title", "bullets", "images", "requiredAttributes"],
+  "properties": {
+    "channel": { "type": "string" },
+    "name": { "type": "string" },
+    "version": { "type": "string" },
+    "title": {
+      "type": "object",
+      "required": ["ruleId", "maxCharacters", "minCharacters"],
+      "properties": {
+        "ruleId": { "type": "string" },
+        "maxCharacters": { "type": "number" },
+        "minCharacters": { "type": "number" },
+        "prohibitedWords": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "backendSearchTerms": {
+      "type": "object",
+      "properties": {
+        "ruleId": { "type": "string" },
+        "maxBytes": { "type": "number" },
+        "allowCommas": { "type": "boolean" }
+      }
+    },
+    "bullets": {
+      "type": "object",
+      "required": ["ruleId", "recommendedCount", "minCount"],
+      "properties": {
+        "ruleId": { "type": "string" },
+        "recommendedCount": { "type": "number" },
+        "minCount": { "type": "number" }
+      }
+    },
+    "images": {
+      "type": "object",
+      "required": ["ruleId", "minResolution"],
+      "properties": {
+        "ruleId": { "type": "string" },
+        "minResolution": { "type": "string" },
+        "pureWhiteBackground": { "type": "boolean" }
+      }
+    },
+    "requiredAttributes": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "channel": "flipkart",
+  "name": "Flipkart Seller Hub",
+  "version": "2026.1",
+  "title": {
+    "ruleId": "flipkart.v2026.1.title_max_length",
+    "maxCharacters": 150,
+    "minCharacters": 25,
+    "prohibitedWords": ["best price", "free delivery", "best quality", "offer"]
+  },
+  "backendSearchTerms": {
+    "ruleId": "flipkart.v2026.1.backend_bytes_limit",
+    "maxBytes": 500,
+    "allowCommas": true
+  },
+  "bullets": {
+    "ruleId": "flipkart.v2026.1.bullets_count",
+    "recommendedCount": 5,
+    "minCount": 3,
+    "maxCharPerBullet": 300
+  },
+  "images": {
+    "ruleId": "flipkart.v2026.1.image_resolution",
+    "minResolution": "1100x1100",
+    "pureWhiteBackground": true,
+    "minImageCount": 3
+  },
+  "requiredAttributes": ["name", "price", "stock", "category", "sku"]
+}
