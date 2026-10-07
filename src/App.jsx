@@ -14,6 +14,7 @@ import BatchOptimizerView from './components/BatchOptimizerView';
 import CompetitorBenchmarkView from './components/CompetitorBenchmarkView';
 import KeywordOpportunityView from './components/KeywordOpportunityView';
 import ReviewSentimentView from './components/ReviewSentimentView';
+import AuthModal from './components/AuthModal';
 import { api } from './services/api';
 import { PRODUCTS } from './data/catalogData';
 import { 
@@ -38,7 +39,12 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('featured');
   const [showFilters, setShowFilters] = useState(false);
-  
+
+  // Authorized Access State
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return Boolean(localStorage.getItem('oct_auth_token'));
+  });
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [apiOnline, setApiOnline] = useState(true);
@@ -50,6 +56,12 @@ export default function App() {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+
+  const handleLogout = () => {
+    localStorage.removeItem('oct_auth_token');
+    localStorage.removeItem('oct_user');
+    setIsAuthenticated(false);
+  };
 
   // Sync theme
   useEffect(() => {
@@ -153,6 +165,11 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-300">
       
+      {/* Authorized Access Lock Modal */}
+      {!isAuthenticated && (
+        <AuthModal onLoginSuccess={() => setIsAuthenticated(true)} />
+      )}
+
       {/* Top Header */}
       <Header
         searchQuery={searchQuery}
@@ -164,6 +181,8 @@ export default function App() {
         onOpenCart={() => setIsCartOpen(true)}
         showFilters={showFilters}
         setShowFilters={setShowFilters}
+        isAuthenticated={isAuthenticated}
+        onLogout={handleLogout}
       />
 
       {/* Navigation Sub-Header Hub */}

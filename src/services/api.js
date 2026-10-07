@@ -8,9 +8,16 @@ const getApiBase = () => {
 };
 
 async function edgeFetch(path, options = {}) {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('oct_auth_token') : null;
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}`, 'x-auth-token': token } : {}),
+    ...(options.headers || {})
+  };
+
   const primaryUrl = `${getApiBase()}${path}`;
   try {
-    const res = await fetch(primaryUrl, options);
+    const res = await fetch(primaryUrl, { ...options, headers });
     if (res.status !== 404 && res.status !== 502 && res.status !== 503) {
       return res;
     }
@@ -22,7 +29,7 @@ async function edgeFetch(path, options = {}) {
   const fallbackUrl = `http://edge.internal/api${path}`;
   const mockReq = new Request(fallbackUrl, {
     method: options.method || 'GET',
-    headers: options.headers || { 'Content-Type': 'application/json' },
+    headers,
     body: options.body || null
   });
   return await handleServerlessApiRequest(mockReq);
@@ -32,6 +39,24 @@ async function edgeFetch(path, options = {}) {
  * Production Catalog, Phase 1, Phase 2 & Phase 3 E-Commerce Intelligence API Client
  */
 export const api = {
+  // Authentication
+  async login(passcode) {
+    const res = await edgeFetch('/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ passcode })
+    });
+    return await res.json();
+  },
+
+  async verifyAuth() {
+    try {
+      const res = await edgeFetch('/auth/verify');
+      return res.ok;
+    } catch (e) {
+      return false;
+    }
+  },
   // -----------------------------------------------------------------
   // Phase 3 Intelligence API Methods
   // -----------------------------------------------------------------

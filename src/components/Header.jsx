@@ -7,7 +7,10 @@ import {
   Sun, 
   Moon, 
   SlidersHorizontal,
-  Sparkles
+  Sparkles,
+  Lock,
+  LogOut,
+  ShieldCheck
 } from 'lucide-react';
 
 export default function Header({ 
@@ -19,7 +22,9 @@ export default function Header({
   favCount, 
   onOpenCart,
   showFilters,
-  setShowFilters
+  setShowFilters,
+  isAuthenticated,
+  onLogout
 }) {
   return (
     <header className="sticky top-0 z-40 w-full glass-panel border-b border-[var(--border-color)] transition-all">
@@ -116,6 +121,18 @@ export default function Header({
               {cartCount}
             </span>
           </button>
+
+          {/* Logout Authorized Access */}
+          {isAuthenticated && (
+            <button
+              onClick={onLogout}
+              className="p-2.5 rounded-xl border border-rose-500/20 text-rose-400 hover:bg-rose-500/10 transition-all flex items-center gap-1.5 text-xs font-bold"
+              title="Lock Session / Logout"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden lg:inline">Lock Session</span>
+            </button>
+          )}
         </div>
 
       </div>
