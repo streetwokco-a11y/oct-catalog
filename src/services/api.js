@@ -156,6 +156,17 @@ export const api = {
     return data.optimization;
   },
 
+  async runOptimizationAll(product) {
+    const res = await edgeFetch('/expert/optimize-all', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ product })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to run parallel swarm optimization');
+    return data;
+  },
+
   async approveOptimization(optimizationId, modifiedOptimized = null) {
     const res = await edgeFetch('/expert/approve', {
       method: 'POST',

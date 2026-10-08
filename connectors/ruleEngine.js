@@ -1,101 +1,16 @@
-const CHANNEL_RULES_MAP = {
-  amazon: {
-    channel: 'amazon',
-    name: 'Amazon Seller Central Marketplace',
-    version: '2026.1',
-    title: {
-      ruleId: 'amazon.v2026.1.title_max_length',
-      maxCharacters: 200,
-      minCharacters: 40,
-      prohibitedWords: ['best seller', 'hot item', 'free shipping', 'top rated', 'cheap', 'discount', '100% guaranteed']
-    },
-    backendSearchTerms: {
-      ruleId: 'amazon.v2026.1.backend_bytes_limit',
-      maxBytes: 249,
-      allowCommas: false,
-      allowDuplication: false
-    },
-    bullets: {
-      ruleId: 'amazon.v2026.1.bullets_count',
-      recommendedCount: 5,
-      minCount: 3,
-      maxCharPerBullet: 250,
-      minCharPerBullet: 50,
-      allowEmojis: false
-    },
-    images: {
-      ruleId: 'amazon.v2026.1.image_resolution',
-      minResolution: '1000x1000',
-      recommendedResolution: '2000x2000',
-      pureWhiteBackground: true,
-      frameFillPercent: 85,
-      minImageCount: 3
-    },
-    requiredAttributes: ['name', 'price', 'stock', 'description', 'category']
-  },
-  flipkart: {
-    channel: 'flipkart',
-    name: 'Flipkart Seller Hub',
-    version: '2026.1',
-    title: {
-      ruleId: 'flipkart.v2026.1.title_max_length',
-      maxCharacters: 150,
-      minCharacters: 25,
-      prohibitedWords: ['best quality', 'lowest price', 'sale']
-    },
-    backendSearchTerms: { ruleId: 'flipkart.v2026.1.backend_bytes_limit', maxBytes: 200, allowCommas: true },
-    bullets: { ruleId: 'flipkart.v2026.1.bullets_count', recommendedCount: 4, minCount: 3 },
-    images: { ruleId: 'flipkart.v2026.1.image_resolution', minResolution: '1100x1100', pureWhiteBackground: true },
-    requiredAttributes: ['name', 'price', 'stock', 'description']
-  },
-  shopify: {
-    channel: 'shopify',
-    name: 'Shopify Storefront API',
-    version: '2026.1',
-    title: { ruleId: 'shopify.v2026.1.title_max_length', maxCharacters: 255, minCharacters: 10 },
-    backendSearchTerms: { ruleId: 'shopify.v2026.1.tags_limit', maxBytes: 500, allowCommas: true },
-    bullets: { ruleId: 'shopify.v2026.1.bullets_count', recommendedCount: 6, minCount: 2 },
-    images: { ruleId: 'shopify.v2026.1.image_resolution', minResolution: '800x800', pureWhiteBackground: false },
-    requiredAttributes: ['name', 'price', 'description']
-  },
-  myntra: {
-    channel: 'myntra',
-    name: 'Myntra Partner Portal',
-    version: '2026.1',
-    title: { ruleId: 'myntra.v2026.1.title_max_length', maxCharacters: 120, minCharacters: 15 },
-    backendSearchTerms: { ruleId: 'myntra.v2026.1.keywords', maxBytes: 200, allowCommas: true },
-    bullets: { ruleId: 'myntra.v2026.1.bullets_count', recommendedCount: 5, minCount: 3 },
-    images: { ruleId: 'myntra.v2026.1.image_resolution', minResolution: '1440x1920', pureWhiteBackground: true },
-    requiredAttributes: ['name', 'price', 'stock', 'description', 'category']
-  },
-  nykaa: {
-    channel: 'nykaa',
-    name: 'Nykaa Seller Portal',
-    version: '2026.1',
-    title: { ruleId: 'nykaa.v2026.1.title_max_length', maxCharacters: 140, minCharacters: 15 },
-    backendSearchTerms: { ruleId: 'nykaa.v2026.1.keywords', maxBytes: 200, allowCommas: true },
-    bullets: { ruleId: 'nykaa.v2026.1.bullets_count', recommendedCount: 5, minCount: 3 },
-    images: { ruleId: 'nykaa.v2026.1.image_resolution', minResolution: '1000x1000', pureWhiteBackground: true },
-    requiredAttributes: ['name', 'price', 'stock', 'description', 'category']
-  }
-};
-
 /**
- * Dynamically load & validate channel rules from config
+ * Oct Catalog — Channel Rule Engine & Policy Auditor (2026 Standards)
  */
-export function getChannelRuleConfig(channel = 'amazon') {
-  const ch = channel.toLowerCase();
-  if (CHANNEL_RULES_MAP[ch]) {
-    return CHANNEL_RULES_MAP[ch];
-  }
-  return CHANNEL_RULES_MAP.amazon;
-}
+
+import { getRuleConfig, amazonAgent, flipkartAgent, nykaaAgent, myntraAgent, shopifyAgent } from './channelAgents.js';
+
+export { getRuleConfig };
 
 /**
  * Audit product against channel JSON rule config with traceable explanations & immutable rule IDs
  */
 export function auditProductWithRules(product = {}, channel = 'amazon') {
-  const rules = getChannelRuleConfig(channel);
+  const rules = getRuleConfig(channel);
   const explanations = [];
 
   const title = String(product.name || '').trim();
@@ -121,7 +36,7 @@ export function auditProductWithRules(product = {}, channel = 'amazon') {
     if (foundFluff.length > 0) {
       titleScore -= 30;
       explanations.push({
-        metric: 'Title SEO',
+        metric: 'Title SEO Policy',
         ruleId: `${rules.channel}.v2026.1.prohibited_fluff`,
         failedRule: `Title contains prohibited promotional terms: "${foundFluff.join(', ')}".`,
         recommendation: `Remove promotional terms to comply with FTC and ${rules.channel.toUpperCase()} policy.`
@@ -149,7 +64,7 @@ export function auditProductWithRules(product = {}, channel = 'amazon') {
       metric: 'Image Completeness',
       ruleId: rules.images.ruleId || `${rules.channel.toUpperCase()}-IMG-MAIN-MISSING`,
       failedRule: `Main image URL is missing.`,
-      recommendation: `Upload main JPEG product image (${rules.images.minResolution}+ resolution).`
+      recommendation: `Upload main product image (${rules.images.minResolution}+ resolution).`
     });
   }
 
@@ -168,7 +83,6 @@ export function auditProductWithRules(product = {}, channel = 'amazon') {
     }
   }
 
-  // Overall Score Calculation
   const overallScore = Math.round(
     (titleScore * 0.25) +
     (bulletScore * 0.25) +
@@ -191,19 +105,15 @@ export function auditProductWithRules(product = {}, channel = 'amazon') {
 }
 
 /**
- * Validate optimized listing data against channel rule schemas before CSV export
+ * Validate listing output per channel prior to CSV export
  */
 export function preValidateExport(optimizedListing = {}, channel = 'amazon') {
-  const rules = getChannelRuleConfig(channel);
-  const errors = [];
+  const ch = channel.toLowerCase();
+  if (ch === 'amazon') return amazonAgent.validatePreExport(optimizedListing);
+  if (ch === 'flipkart') return flipkartAgent.validatePreExport(optimizedListing);
+  if (ch === 'nykaa') return nykaaAgent.validatePreExport(optimizedListing);
+  if (ch === 'myntra') return myntraAgent.validatePreExport(optimizedListing);
+  if (ch === 'shopify') return shopifyAgent.validatePreExport(optimizedListing);
 
-  const title = optimizedListing.title || '';
-  if (rules.title.maxCharacters && title.length > rules.title.maxCharacters) {
-    errors.push(`Title length (${title.length}) exceeds ${rules.channel.toUpperCase()} max allowed (${rules.title.maxCharacters})`);
-  }
-
-  return {
-    valid: errors.length === 0,
-    errors
-  };
+  return { valid: true, errors: [] };
 }

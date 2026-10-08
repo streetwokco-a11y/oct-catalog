@@ -3,12 +3,14 @@
   "name": "Nykaa Merchant Network",
   "version": "2026.1",
   "title": {
-    "ruleId": "nykaa.v2026.1.title_max_length",
-    "maxCharacters": 150,
-    "minCharacters": 20
+    "ruleId": "nykaa.v2026.1.title_formula",
+    "formula": "[Brand] [Product Name] - [Shade] | [Key Ingredient]",
+    "maxCharacters": 140,
+    "minCharacters": 20,
+    "prohibitedWords": ["100% cure", "instant miracle", "cheap"]
   },
   "backendSearchTerms": {
-    "ruleId": "nykaa.v2026.1.backend_bytes_limit",
+    "ruleId": "nykaa.v2026.1.keywords",
     "maxBytes": 500,
     "allowCommas": true
   },
@@ -21,7 +23,15 @@
     "ruleId": "nykaa.v2026.1.image_resolution",
     "minResolution": "1000x1000",
     "pureWhiteBackground": true,
+    "requireShadeSwatch": true,
     "minImageCount": 3
   },
-  "requiredAttributes": ["name", "price", "stock", "Shade", "Certification"]
+  "requiredAttributes": [
+    "name",
+    "price",
+    "stock",
+    "Shade",
+    "Ingredients",
+    "AuthenticityCertification"
+  ]
 }

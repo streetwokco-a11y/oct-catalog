@@ -3,10 +3,23 @@
   "name": "Flipkart Seller Hub",
   "version": "2026.1",
   "title": {
-    "ruleId": "flipkart.v2026.1.title_max_length",
+    "ruleId": "flipkart.v2026.1.title_formula",
+    "formula": "[Brand] [Product Name] ([Variant], [Color])",
     "maxCharacters": 150,
     "minCharacters": 25,
-    "prohibitedWords": ["best price", "free delivery", "best quality", "offer"]
+    "prohibitedWords": [
+      "best price",
+      "free delivery",
+      "best quality",
+      "offer",
+      "lowest price",
+      "discount"
+    ]
+  },
+  "pricing": {
+    "ruleId": "flipkart.v2026.1.mrp_sanity_check",
+    "enforceMrpSanity": true,
+    "message": "Selling price must be less than or equal to Maximum Retail Price (MRP)"
   },
   "backendSearchTerms": {
     "ruleId": "flipkart.v2026.1.backend_bytes_limit",
@@ -25,5 +38,5 @@
     "pureWhiteBackground": true,
     "minImageCount": 3
   },
-  "requiredAttributes": ["name", "price", "stock", "category", "sku"]
+  "requiredAttributes": ["name", "price", "stock", "category", "sku", "mrp"]
 }

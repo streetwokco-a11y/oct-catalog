@@ -5,6 +5,7 @@ import url from 'url';
 import crypto from 'crypto';
 import { dispatchToMarketplaces, DEFAULT_PRICING_RULES } from './connectors/marketplaceConnectors.js';
 import { runBrandDNAAgent, runListingAuditAgent, runListingOptimizerAgent, DEFAULT_BRAND_DNA } from './connectors/expertAgents.js';
+import { runAllChannelAgents } from './connectors/channelAgents.js';
 import { runCompetitorBenchmark, discoverKeywordOpportunities, extractReviewSentiment, COMPETITOR_BENCHMARKS } from './connectors/competitorEngine.js';
 
 const __filename = url.fileURLToPath(import.meta.url);
@@ -254,6 +255,45 @@ const server = http.createServer(async (req, res) => {
       writeDB(db);
 
       return sendJson(res, 200, { success: true, optimization: record });
+    }
+
+    if (pathname === '/api/expert/optimize-all' && req.method === 'POST') {
+      const payload = await parseJsonBody(req);
+      const { product } = payload;
+      const db = readDB();
+
+      if (!product) return sendJson(res, 400, { success: false, message: 'Product object required for swarm optimization' });
+
+      const swarmResult = await runAllChannelAgents(product, db.brand_dna);
+
+      db.audit_logs = db.audit_logs || [];
+      db.audit_logs.push({
+        auditId: 'swarm-' + crypto.randomBytes(4).toString('hex'),
+        productId: product.id || 'draft',
+        executedChannelsCount: 5,
+        timestamp: new Date().toISOString()
+      });
+
+      writeDB(db);
+
+      return sendJson(res, 200, swarmResult);
+    }
+
+    if (pathname === '/api/orders' && req.method === 'POST') {
+      const payload = await parseJsonBody(req);
+      const db = readDB();
+      const newOrder = {
+        id: 'ord-' + crypto.randomBytes(4).toString('hex'),
+        items: payload.items || [],
+        total: Number(payload.total) || 0,
+        status: 'PROCESSING',
+        createdAt: new Date().toISOString()
+      };
+      db.orders = db.orders || [];
+      db.orders.push(newOrder);
+      writeDB(db);
+
+      return sendJson(res, 201, { success: true, order: newOrder });
     }
 
     if (pathname === '/api/expert/approve' && req.method === 'POST') {

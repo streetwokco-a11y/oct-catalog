@@ -3,12 +3,13 @@
   "name": "Myntra Partner Portal",
   "version": "2026.1",
   "title": {
-    "ruleId": "myntra.v2026.1.title_max_length",
+    "ruleId": "myntra.v2026.1.title_formula",
+    "formula": "[Brand] [Product Name] Apparel",
     "maxCharacters": 120,
     "minCharacters": 20
   },
   "backendSearchTerms": {
-    "ruleId": "myntra.v2026.1.backend_bytes_limit",
+    "ruleId": "myntra.v2026.1.keywords",
     "maxBytes": 500,
     "allowCommas": true
   },
@@ -18,10 +19,20 @@
     "minCount": 3
   },
   "images": {
-    "ruleId": "myntra.v2026.1.image_resolution",
+    "ruleId": "myntra.v2026.1.image_aspect_ratio",
     "minResolution": "1080x1440",
+    "recommendedResolution": "1500x2000",
     "aspectRatio": "3:4",
+    "nearWhiteBackground": true,
+    "rejectPureWhite": true,
     "minImageCount": 4
   },
-  "requiredAttributes": ["name", "price", "stock", "Size", "Material"]
+  "requiredAttributes": [
+    "name",
+    "price",
+    "stock",
+    "SizeMatrix",
+    "FabricComposition",
+    "CareInstructions"
+  ]
 }

@@ -1,9 +1,19 @@
 /**
- * Phase 2 E-Commerce Expert Subagent Engine (Hardened & Annotated)
+ * Phase 2 & Phase 3 E-Commerce Expert Subagent Engine (Multi-Agent Swarm Orchestrator)
  */
 
 import { runClaimGuard } from './claimGuard.js';
 import { auditProductWithRules, preValidateExport } from './ruleEngine.js';
+import {
+  amazonAgent,
+  flipkartAgent,
+  nykaaAgent,
+  myntraAgent,
+  shopifyAgent,
+  runAllChannelAgents
+} from './channelAgents.js';
+
+export { runAllChannelAgents };
 
 // Default Brand DNA Profile template
 export const DEFAULT_BRAND_DNA = {
@@ -60,8 +70,16 @@ export function runBrandDNAAgent(customDna = {}) {
   };
 }
 
-export function runListingAuditAgent(product = {}, channel = 'amazon') {
+export async function runListingAuditAgent(product = {}, channel = 'amazon') {
   const chLower = channel.toLowerCase();
+  let agentRes;
+  if (chLower === 'amazon') agentRes = await amazonAgent.audit(product, DEFAULT_BRAND_DNA);
+  else if (chLower === 'flipkart') agentRes = await flipkartAgent.audit(product, DEFAULT_BRAND_DNA);
+  else if (chLower === 'nykaa') agentRes = await nykaaAgent.audit(product, DEFAULT_BRAND_DNA);
+  else if (chLower === 'myntra') agentRes = await myntraAgent.audit(product, DEFAULT_BRAND_DNA);
+  else if (chLower === 'shopify') agentRes = await shopifyAgent.audit(product, DEFAULT_BRAND_DNA);
+  else agentRes = await amazonAgent.audit(product, DEFAULT_BRAND_DNA);
+
   const ruleAudit = auditProductWithRules(product, chLower);
   const claimGuardResult = runClaimGuard(
     `${product.name} ${product.description} ${(product.features || []).join(' ')}`,
@@ -71,108 +89,37 @@ export function runListingAuditAgent(product = {}, channel = 'amazon') {
 
   return {
     success: true,
-    agent: 'ListingAuditAgent',
+    agent: agentRes.agent || 'ListingAuditAgent',
     channel: chLower,
-    overallScore: ruleAudit.overallScore,
+    overallScore: agentRes.overallScore || ruleAudit.overallScore,
     metrics: ruleAudit.metrics,
-    explanations: ruleAudit.explanations,
+    explanations: agentRes.explanations || ruleAudit.explanations,
     claimGuard: claimGuardResult,
     auditedAt: new Date().toISOString()
   };
 }
 
-export function runListingOptimizerAgent(product = {}, brandDna = DEFAULT_BRAND_DNA, channel = 'amazon') {
-  const brand = brandDna.brandName || 'OCT';
-  const categoryLabel = (product.category || 'hardware').toUpperCase();
+export async function runListingOptimizerAgent(product = {}, brandDna = DEFAULT_BRAND_DNA, channel = 'amazon') {
   const chLower = channel.toLowerCase();
+  let optResult;
 
-  const beforeAudit = runListingAuditAgent(product, chLower);
+  if (chLower === 'amazon') optResult = await amazonAgent.optimize(product, brandDna);
+  else if (chLower === 'flipkart') optResult = await flipkartAgent.optimize(product, brandDna);
+  else if (chLower === 'nykaa') optResult = await nykaaAgent.optimize(product, brandDna);
+  else if (chLower === 'myntra') optResult = await myntraAgent.optimize(product, brandDna);
+  else if (chLower === 'shopify') optResult = await shopifyAgent.optimize(product, brandDna);
+  else optResult = await amazonAgent.optimize(product, brandDna);
 
-  // Generate Channel Specific Optimized Title
-  let optimizedTitle = `${brand} ${product.name} - ${categoryLabel} | High-Performance Enterprise Grade`;
-  let titleReason = `Front-loaded ${brand} brand name and key attributes for ${chLower.toUpperCase()} search crawl index.`;
-
-  if (chLower === 'flipkart') {
-    optimizedTitle = `${brand} ${product.name} (${product.category}, Black)`;
-    titleReason = `Formatted title per Flipkart rule (Brand + Title + Variant) within 150-char limit.`;
-  } else if (chLower === 'shopify') {
-    optimizedTitle = `${product.name} | ${brand} Official Store`;
-    titleReason = `Formatted title for Shopify SEO store collection pages.`;
-  } else if (chLower === 'myntra') {
-    optimizedTitle = `${brand} ${product.name} Apparel`;
-    titleReason = `Apparel taxonomy structure applied for Myntra Partner Hub.`;
-  } else if (chLower === 'nykaa') {
-    optimizedTitle = `${brand} ${product.name} - Universal Shade`;
-    titleReason = `Beauty shade swatch attribute structure applied per Nykaa rulebook.`;
-  }
-
-  // Benefit-First 5 Bullets
-  const optimizedBullets = [
-    `ENTERPRISE PERFORMANCE: Powered by ${brand}'s proprietary architecture for seamless throughput.`,
-    `ADVANCED THERMAL DYNAMICS: Integrated dual-chamber liquid cooling maintains maximum efficiency without throttling.`,
-    `PLUG & PLAY COMPATIBILITY: Native support for Matter, USB-C, and high-speed PCIe expansion bays.`,
-    `BENEFIT DRIVEN RELIABILITY: Engineered to withstand demanding 24/7 continuous workloads with minimal acoustic output.`,
-    `CERTIFIED WARRANTY & SUPPORT: Backed by ${brand}'s 2-Year Direct Warranty and dedicated technical customer service.`
-  ];
-  const bulletReasons = [
-    `Converted technical feature into customer benefit sentence case (150-250 chars).`,
-    `Highlighted liquid cooling differentiator to solve thermal throttling pain point.`,
-    `Populated compatibility matrix attributes.`,
-    `Reinforced reliability messaging per Brand DNA guidelines.`,
-    `Included verified warranty terms for customer confidence.`
-  ];
-
-  // 249-Byte Non-Duplicate Search Terms
-  const backendSearchTerms = `${product.name} ${product.category} workstation liquid cooled local ai tensor engine hardware computing fast processor`.toLowerCase();
-  const searchTermsReason = `Deduplicated synonyms formatted without commas to fill 249-byte Amazon backend limit.`;
-
-  const optimizedProduct = {
-    ...product,
-    name: optimizedTitle,
-    features: optimizedBullets,
-    backendSearchTerms
-  };
-
-  const afterAudit = runListingAuditAgent(optimizedProduct, chLower);
-  const claimGuardResult = runClaimGuard(
-    `${optimizedTitle} ${optimizedBullets.join(' ')}`,
-    optimizedProduct,
-    brandDna
-  );
-  const exportValidation = preValidateExport(optimizedProduct, chLower);
+  const exportValidation = preValidateExport(optResult.optimized, chLower);
 
   return {
     success: true,
-    agent: 'ListingOptimizerAgent',
+    agent: optResult.agent,
     channel: chLower,
-    original: {
-      title: product.name || '',
-      bullets: Array.isArray(product.features) ? product.features : [],
-      description: product.description || '',
-      score: beforeAudit.overallScore
-    },
-    optimized: {
-      title: optimizedTitle,
-      titleReason,
-      bullets: optimizedBullets,
-      bulletReasons,
-      description: `${product.description || ''}\n\nDesigned by ${brand}, this product meets stringent multi-channel quality standards. Engineered for maximum longevity and energy efficiency.`,
-      backendSearchTerms,
-      searchTermsReason,
-      score: afterAudit.overallScore,
-      imageChecklist: [
-        { type: 'Main Image', rule: '1000x1000+ JPEG, Pure White Background (#FFFFFF), Product fills 85% frame' },
-        { type: 'Scale & Dimensions', rule: 'Infograph showing exact height, width, and cable clearance' },
-        { type: 'Key Feature Callout', rule: 'Close-up shot of cooling loop and ports with clean typography callouts' },
-        { type: 'Lifestyle In-Use', rule: 'Clean modern desk setup showing product in professional environment' }
-      ]
-    },
-    scoringDifferential: {
-      beforeScore: beforeAudit.overallScore,
-      afterScore: afterAudit.overallScore,
-      improvement: afterAudit.overallScore - beforeAudit.overallScore
-    },
-    claimGuard: claimGuardResult,
+    original: optResult.original,
+    optimized: optResult.optimized,
+    scoringDifferential: optResult.scoringDifferential,
+    claimGuard: optResult.claimGuard,
     exportValidation,
     status: 'PENDING_APPROVAL',
     optimizedAt: new Date().toISOString()

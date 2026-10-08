@@ -6,7 +6,21 @@
     "ruleId": "amazon.v2026.1.title_max_length",
     "maxCharacters": 200,
     "minCharacters": 40,
-    "prohibitedWords": ["best seller", "hot item", "free shipping", "top rated", "cheap", "discount", "100% guaranteed"]
+    "frontLoadBrand": true,
+    "prohibitedWords": [
+      "best seller",
+      "hot item",
+      "free shipping",
+      "top rated",
+      "cheap",
+      "discount",
+      "100% guaranteed",
+      "sale",
+      "limited time",
+      "n1",
+      "number 1",
+      "gift"
+    ]
   },
   "backendSearchTerms": {
     "ruleId": "amazon.v2026.1.backend_bytes_limit",
@@ -17,18 +31,25 @@
   "bullets": {
     "ruleId": "amazon.v2026.1.bullets_count",
     "recommendedCount": 5,
-    "minCount": 3,
+    "minCount": 5,
     "maxCharPerBullet": 250,
     "minCharPerBullet": 50,
-    "allowEmojis": false
+    "capitalizeFirstWord": true,
+    "allowEmojis": false,
+    "allowHtml": false
   },
   "images": {
     "ruleId": "amazon.v2026.1.image_resolution",
-    "minResolution": "1000x1000",
+    "minResolution": "1600x1600",
     "recommendedResolution": "2000x2000",
     "pureWhiteBackground": true,
+    "requiredHexCode": "#FFFFFF",
     "frameFillPercent": 85,
-    "minImageCount": 3
+    "minImageCount": 5
   },
-  "requiredAttributes": ["name", "price", "stock", "description", "category"]
+  "ftcCompliance": {
+    "ruleId": "amazon.v2026.1.ftc_truth_in_advertising",
+    "enforceClaimGuard": true
+  },
+  "requiredAttributes": ["name", "price", "stock", "description", "category", "sku", "specs"]
 }

@@ -1,16 +1,22 @@
 {
   "channel": "shopify",
-  "name": "Shopify Online Store Admin",
+  "name": "Shopify Online Store Admin & Storefront API",
   "version": "2026.1",
   "title": {
-    "ruleId": "shopify.v2026.1.title_max_length",
+    "ruleId": "shopify.v2026.1.seo_title",
+    "formula": "[Product Name] | [Brand] Official Store",
     "maxCharacters": 255,
     "minCharacters": 10
   },
   "backendSearchTerms": {
-    "ruleId": "shopify.v2026.1.backend_bytes_limit",
+    "ruleId": "shopify.v2026.1.tags_limit",
     "maxBytes": 1000,
     "allowCommas": true
+  },
+  "description": {
+    "ruleId": "shopify.v2026.1.html_formatting",
+    "format": "HTML",
+    "requiredTags": ["h3", "ul", "table"]
   },
   "bullets": {
     "ruleId": "shopify.v2026.1.bullets_count",
@@ -23,5 +29,5 @@
     "pureWhiteBackground": false,
     "minImageCount": 1
   },
-  "requiredAttributes": ["name", "price", "stock", "description"]
+  "requiredAttributes": ["name", "price", "stock", "description", "handle"]
 }

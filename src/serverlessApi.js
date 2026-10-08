@@ -5,6 +5,7 @@
 
 import { dispatchToMarketplaces, DEFAULT_PRICING_RULES } from '../connectors/marketplaceConnectors.js';
 import { runBrandDNAAgent, runListingAuditAgent, runListingOptimizerAgent, DEFAULT_BRAND_DNA } from '../connectors/expertAgents.js';
+import { runAllChannelAgents } from '../connectors/channelAgents.js';
 import { runCompetitorBenchmark, discoverKeywordOpportunities, extractReviewSentiment } from '../connectors/competitorEngine.js';
 import { PRODUCTS, CATEGORIES } from './data/catalogData.js';
 
@@ -229,6 +230,30 @@ export async function handleServerlessApiRequest(request) {
       }
 
       return jsonResponse({ success: true, optimization: record });
+    }
+
+    // Parallel Swarm Mode Multi-Agent Optimization
+    if (pathname === '/api/expert/optimize-all' && method === 'POST') {
+      const payload = await request.json();
+      const { product } = payload;
+      if (!product) return jsonResponse({ success: false, message: 'Product required' }, 400);
+
+      const swarmResult = await runAllChannelAgents(product, edgeStore.brand_dna);
+      return jsonResponse(swarmResult);
+    }
+
+    // POST /api/orders
+    if (pathname === '/api/orders' && method === 'POST') {
+      const body = await request.json();
+      const newOrder = {
+        id: 'ord-' + String(Date.now()).slice(-6),
+        items: body.items || [],
+        total: Number(body.total) || 0,
+        status: 'PROCESSING',
+        createdAt: new Date().toISOString()
+      };
+      edgeStore.orders.push(newOrder);
+      return jsonResponse({ success: true, order: newOrder }, 201);
     }
 
     // Approve
