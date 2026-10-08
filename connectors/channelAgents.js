@@ -18,6 +18,14 @@ const RULES_MAP = {
   shopify: shopifyRule
 };
 
+function getByteLength(str) {
+  if (!str) return 0;
+  if (typeof Buffer !== 'undefined') {
+    return Buffer.byteLength(str, 'utf8');
+  }
+  return new TextEncoder().encode(str).length;
+}
+
 export function getRuleConfig(channel = 'amazon') {
   const ch = channel.toLowerCase();
   return RULES_MAP[ch] || RULES_MAP.amazon;
@@ -116,7 +124,7 @@ export class AmazonChannelAgent {
     const rawSearch = `${product.name} ${product.category} workstation liquid cooling local ai tensor engine processor`.toLowerCase();
     const searchTermsSet = new Set(rawSearch.split(/\s+/).filter(w => w.length > 2 && !optimizedTitle.toLowerCase().includes(w)));
     let backendSearchTerms = Array.from(searchTermsSet).join(' ');
-    while (Buffer.byteLength(backendSearchTerms, 'utf8') > 249) {
+    while (getByteLength(backendSearchTerms) > 249) {
       const parts = backendSearchTerms.split(' ');
       parts.pop();
       backendSearchTerms = parts.join(' ');
@@ -141,7 +149,7 @@ export class AmazonChannelAgent {
         bullets: optimizedBullets,
         bulletReasons: '5 capitalized benefit-first bullets without promotional fluff.',
         backendSearchTerms,
-        searchTermsReason: `${Buffer.byteLength(backendSearchTerms, 'utf8')}-byte deduplicated search terms without commas.`,
+        searchTermsReason: `${getByteLength(backendSearchTerms)}-byte deduplicated search terms without commas.`,
         score: afterAudit.overallScore,
         imageChecklist: [
           { type: 'Main Image', requirement: '1600x1600+ JPEG, Pure White Background (#FFFFFF), Product fills 85% frame' },
@@ -160,7 +168,7 @@ export class AmazonChannelAgent {
   validatePreExport(listing = {}) {
     const errors = [];
     if (listing.title && listing.title.length > 200) errors.push('Title exceeds Amazon 200 char limit.');
-    if (listing.backendSearchTerms && Buffer.byteLength(listing.backendSearchTerms, 'utf8') > 249) errors.push('Backend search terms exceed 249 bytes.');
+    if (listing.backendSearchTerms && getByteLength(listing.backendSearchTerms) > 249) errors.push('Backend search terms exceed 249 bytes.');
     if (listing.backendSearchTerms && listing.backendSearchTerms.includes(',')) errors.push('Backend search terms must not contain commas.');
     return { valid: errors.length === 0, errors };
   }
